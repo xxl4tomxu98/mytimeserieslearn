@@ -30,7 +30,9 @@ np.random.seed(123124)
 data = load_watch()
 X = data['X']
 y = data['y']
-
+print("Length of X: ", len(X))
+print("length of elements of list X: ", [len(e) for e in X])
+print("Length of y: ", len(y))
 # create a feature representation pipeline
 clf = Pype([('segment', Segment()),
             ('features', FeatureRep()),
@@ -67,7 +69,7 @@ plt.show()
 
 # let's try some context data
 Xc = np.column_stack((data['side'], data['subject']))
-Xt = np.array(data['X'])
+Xt = np.array(data['X'], dtype=object)
 X = TS_Data(Xt, Xc)
 y = np.array(data['y'])
 
