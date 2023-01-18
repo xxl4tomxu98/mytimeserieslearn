@@ -165,8 +165,8 @@ class Segment(BaseEstimator, XyTransformerMixin):
         X : array-like, shape [n_series, ...]
             Time series data and (optionally) contextual data
         y : None
-            There is no need of a target in a transformer, yet the pipeline API requires
-            this parameter.
+            There is no need of a target in a transformer,
+            yet the pipeline API requires this parameter.
         shuffle : bool
             Shuffles data after transformation
         Returns
@@ -179,9 +179,9 @@ class Segment(BaseEstimator, XyTransformerMixin):
 
     def transform(self, X, y=None, sample_weight=None):
         """
-        Transforms the time series data into segments (temporal tensor)
-        Note this transformation changes the number of samples in the data
-        If y and sample_weight are provided, they are transformed to align to the new samples
+        Transforms the time series data into segments (temporal tensor). Note this transformation
+        changes the number of samples in the data, If y and sample_weight are provided,
+        they are transformed to align to the new samples
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -221,7 +221,6 @@ class Segment(BaseEstimator, XyTransformerMixin):
         else:
             Xt = np.array([sliding_window(Xt[i], self.width, self._step, self.order)
                            for i in np.arange(N)], dtype=object)
-
         Nt = [len(Xt[i]) for i in np.arange(len(Xt))]
         Xt = np.concatenate(Xt).astype(float)
         if Xc is not None:
@@ -248,8 +247,7 @@ class SegmentX(Segment):
 
     Transformer for sliding window segmentation for datasets where
     X is time series data, optionally with contextual variables
-    and each time series in X has a single target value y
-
+    and each time series in X has a single target value y.
     The target y is mapped to all segments from their parent series.
     The transformed data consists of segment/target pairs that can be learned
     through a feature representation or directly with a neural network.
@@ -293,16 +291,13 @@ class SegmentXY(Segment):
 
     Transformer for sliding window segmentation for datasets where
     X is time series data, optionally with contextual variables
-    and y is also time series data with the same sampling interval as X
-
+    and y is also time series data with the same sampling interval as X.
     The target y is mapped to segments from their parent series,
     using the parameter ``y_func`` to determine the mapping behavior.
     The segment targets can be a single value, or a sequence of values
     depending on ``y_func`` parameter.
-
     The transformed data consists of segment/target pairs that can be learned
     through a feature representation or directly with a neural network.
-
 
     Parameters
     ----------
@@ -326,19 +321,15 @@ class SegmentXY(Segment):
         index changes slowest) and 'F' means Fortran-like index order (last index changes slowest).
         'C' ordering is suggested for neural network estimators, and 'F' ordering is suggested for computing
         feature representations.
-
     Returns
     -------
     self : object
         Returns self.
     """
-
     def __init__(self, width=100, overlap=0.5, step=None, y_func=last, shuffle=False,
                  random_state=None, order='F'):
-
-        super().__init__(width=width, overlap=overlap, step=step, y_func=y_func, shuffle=shuffle, random_state=random_state,
-                         order=order)
-
+        super().__init__(width=width, overlap=overlap, step=step, y_func=y_func, shuffle=shuffle,
+                         random_state=random_state, order=order)
         warnings.warn("deprecated, use Segment class", DeprecationWarning)
 
 
@@ -380,17 +371,15 @@ class SegmentXYForecast(Segment):
     self : object
         Returns self.
     """
-
     def __init__(self, width=100, overlap=0.5, step=None, forecast=10, y_func=last, shuffle=False,
                  random_state=None, order='F'):
 
-        super().__init__(width=width, overlap=overlap, step=step, shuffle=shuffle, random_state=random_state,
-                         order=order)
+        super().__init__(width=width, overlap=overlap, step=step, shuffle=shuffle,
+                         random_state=random_state, order=order)
         if not forecast >= 1:
             raise ValueError("forecast must be >=1 (was %d)" % forecast)
         self.y_func = y_func
         self.forecast = forecast
-
 
     def transform(self, X, y=None, sample_weight=None):
         """
@@ -535,15 +524,13 @@ class PadTrunc(BaseEstimator, XyTransformerMixin):
     def fit(self, X, y=None):
         """
         Fit the transform. Does nothing, for compatibility with sklearn API.
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
             Time series data and (optionally) contextual data
         y : None
-            There is no need of a target in a transformer, yet the pipeline API requires this
-            parameter.
-
+            There is no need of a target in a transformer, yet the
+            pipeline API requires this parameter.
         Returns
         -------
         self : object
@@ -556,7 +543,6 @@ class PadTrunc(BaseEstimator, XyTransformerMixin):
         """
         Transforms the time series data into fixed length segments using padding and or truncation
         If y is a time series and passed, it will be transformed as well
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -565,7 +551,6 @@ class PadTrunc(BaseEstimator, XyTransformerMixin):
             target vector
         sample_weight : array-like shape [n_series], default = None
             sample weights
-
         Returns
         -------
         X_new : array-like, shape [n_series, ]
@@ -579,12 +564,9 @@ class PadTrunc(BaseEstimator, XyTransformerMixin):
         Xt, Xc = get_ts_data_parts(X)
         yt = y
         swt = sample_weight
-
         Xt = self._mv_resize(Xt)
-
         if Xc is not None:
             Xt = TS_Data(Xt, Xc)
-
         if yt is not None and ts_target:
             # y is a time series
             yt = self._mv_resize(yt)
@@ -592,16 +574,14 @@ class PadTrunc(BaseEstimator, XyTransformerMixin):
         elif yt is not None:
             # todo: is this needed?
             yt = np.array(yt)
-
         return Xt, yt, swt
 
 
 class Interp(BaseEstimator, XyTransformerMixin):
     """
     Transformer for resampling time series data to a fixed period over closed interval
-    (direct value interpolation).
-    Default interpolation is linear, but other types can be specified.
-    If the target is a series, it will be resampled as well.
+    (direct value interpolation). Default interpolation is linear, but other types can
+    be specified. If the target is a series, it will be resampled as well.
 
     categorical_target should be set to True if the target series is a class
     The transformer will then use nearest neighbor interp on the target.
@@ -621,13 +601,10 @@ class Interp(BaseEstimator, XyTransformerMixin):
         target
     assume_sorted : bool
         assume time series data is sorted by timestamp
-
     """
-
     def __init__(self, sample_period, kind='linear', categorical_target=False, assume_sorted=True):
         if not sample_period > 0:
             raise ValueError("sample_period must be >0 (was %f)" % sample_period)
-
         self.sample_period = sample_period
         self.kind = kind
         self.categorical_target = categorical_target
@@ -636,7 +613,6 @@ class Interp(BaseEstimator, XyTransformerMixin):
     def fit(self, X, y=None):
         """
         Fit the transform. Does nothing, for compatibility with sklearn API.
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -644,7 +620,6 @@ class Interp(BaseEstimator, XyTransformerMixin):
         y : None
             There is no need of a target in a transformer, yet the pipeline API requires this
             parameter.
-
         Returns
         -------
         self : object
@@ -653,14 +628,11 @@ class Interp(BaseEstimator, XyTransformerMixin):
         check_ts_data(X, y)
         if not X[0].ndim > 1:
             raise ValueError("X variable must have more than 1 channel")
-
         return self
 
     def _interp(self, t_new, t, x, kind):
-
         if not self.assume_sorted:
             t, x = interp_sort(t, x)
-
         interpolator = interp1d(t, x, kind=kind, copy=False, bounds_error=False,
                                 fill_value="extrapolate", assume_sorted=True)
         return interpolator(t_new)
@@ -670,7 +642,6 @@ class Interp(BaseEstimator, XyTransformerMixin):
         Transforms the time series data with linear direct value interpolation
         If y is a time series and passed, it will be transformed as well
         The time dimension is removed from the data
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -679,7 +650,6 @@ class Interp(BaseEstimator, XyTransformerMixin):
             target vector
         sample_weight : array-like shape [n_series], default = None
             sample weights
-
         Returns
         -------
         X_new : array-like, shape [n_series, ]
@@ -696,11 +666,9 @@ class Interp(BaseEstimator, XyTransformerMixin):
 
         N = len(Xt)  # number of series
         D = Xt[0].shape[1] - 1  # number of data channels
-
         # 1st channel is time
         t = [Xt[i][:, 0] for i in np.arange(N)]
         t_lin = [np.arange(Xt[i][0, 0], Xt[i][-1, 0], self.sample_period) for i in np.arange(N)]
-
         if D == 1:
             Xt = [self._interp(t_lin[i], t[i], Xt[i][:, 1], kind=self.kind) for i in np.arange(N)]
         elif D > 1:
@@ -708,7 +676,6 @@ class Interp(BaseEstimator, XyTransformerMixin):
                                    for j in range(1, D + 1)]) for i in np.arange(N)]
         if Xc is not None:
             Xt = TS_Data(Xt, Xc)
-
         if yt is not None and ts_target:
             # y is a time series
             swt = None
@@ -719,7 +686,6 @@ class Interp(BaseEstimator, XyTransformerMixin):
         else:
             # y is static - leave y alone
             pass
-
         return Xt, yt, swt
 
 
@@ -773,13 +739,10 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
     >>> stacked_interp = InterpLongToWide(0.5)
     >>> stacked_interp.fit(X, y)
     >>> Xc, yc, _ = stacked_interp.transform(X, y)
-
     """
-
     def __init__(self, sample_period, kind='linear', categorical_target=False, assume_sorted=True):
         if not sample_period > 0:
             raise ValueError("sample_period must be >0 (was %f)" % sample_period)
-
         self.sample_period = sample_period
         self.kind = kind
         self.categorical_target = categorical_target
@@ -788,7 +751,6 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
     def fit(self, X, y=None):
         """
         Fit the transform. Does nothing, for compatibility with sklearn API.
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -796,7 +758,6 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
         y : None
             There is no need of a target in a transformer, yet the pipeline API requires this
             parameter.
-
         Returns
         -------
         self : object
@@ -810,13 +771,11 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
     def _check_data(self, X):
         """
         Checks that unique identifiers vaf_types are consistent between time series.
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
             Time series data and (optionally) contextual data
         """
-
         if len(X) > 1:
             sval = np.unique(X[0][:, 1])
             if np.all([np.all(np.unique(X[i][:, 1]) == sval) for i in range(1, len(X))]):
@@ -828,7 +787,6 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
 
         if not self.assume_sorted:
             t, x = interp_sort(t, x)
-
         interpolator = interp1d(t, x, kind=kind, copy=False, bounds_error=False,
                                 fill_value="extrapolate", assume_sorted=True)
         return interpolator(t_new)
@@ -838,7 +796,6 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
         Transforms the time series data with linear direct value interpolation
         If y is a time series and passed, it will be transformed as well
         The time dimension is removed from the data
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -847,7 +804,6 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
             target vector
         sample_weight : array-like shape [n_series], default = None
             sample weights
-
         Returns
         -------
         X_new : array-like, shape [n_series, ]
@@ -861,31 +817,23 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
         xt, xc = get_ts_data_parts(X)
         yt = y
         swt = sample_weight
-
         # number of data channels
         d = xt[0][0].shape[0] - 2
         # number of series
         N = len(xt)
-
         # retrieve the unique identifiers
         s = np.unique(xt[0][:, 1])
-
         x_new = []
         t_lin = []
-
         # transform x
         for i in np.arange(N):
-
             # splits series into a list for each variable
             xs = [xt[i][xt[i][:, 1] == s[j]] for j in np.arange(len(s))]
-
             # find latest/earliest sample time for each identifier's first/last time sample time
             t_min = np.max([np.min(xs[j][:, 0]) for j in np.arange(len(s))])
             t_max = np.min([np.max(xs[j][:, 0]) for j in np.arange(len(s))])
-
             # Generate a regular series of timestamps starting at tStart and tEnd for sample_period
             t_lin.append(np.arange(t_min, t_max, self.sample_period))
-
             # Interpolate for the new regular sample times
             if d == 1:
                 x_new.append(
@@ -902,7 +850,6 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
                     xd.append(temp)
                 # column stack each of the sensors s -- resulting in s*d columns
                 x_new.append(np.column_stack(xd))
-
         # transform y
         if yt is not None and ts_target:
             # y is a time series
@@ -916,10 +863,8 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
         else:
             # y is static - leave y alone
             pass
-
         if xc is not None:
             x_new = TS_Data(x_new, xc)
-
         return x_new, yt, swt
 
 
@@ -973,9 +918,7 @@ class FeatureRep(BaseEstimator, TransformerMixin):
     >>>             ('rf',RandomForestClassifier())])
     >>> clf.fit(X, y)
     >>> print(clf.score(X, y))
-
     """
-
     def __init__(self, features='default', verbose=False):
         if features == 'default':
             self.features = base_features()
@@ -983,17 +926,14 @@ class FeatureRep(BaseEstimator, TransformerMixin):
             if not isinstance(features, dict):
                 raise TypeError("features must either 'default' or an instance of type dict")
             self.features = features
-
         if type(verbose) != bool:
             raise TypeError("verbose parameter must be type boolean")
-
         self.verbose = verbose
         self.f_labels = None
 
     def fit(self, X, y=None):
         """
         Fit the transform
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -1001,7 +941,6 @@ class FeatureRep(BaseEstimator, TransformerMixin):
         y : None
             There is no need of a target in a transformer, yet the pipeline API requires this
             parameter.
-
         Returns
         -------
         self : object
@@ -1083,21 +1022,17 @@ class FeatureRep(BaseEstimator, TransformerMixin):
         Generates string feature labels
         """
         Xt, Xc = get_ts_data_parts(X)
-
         ftr_sizes = self._check_features(self.features, Xt[0:3])
         f_labels = []
-
         # calculated features
         for key in ftr_sizes:
             for i in range(ftr_sizes[key]):
                 f_labels += [key + '_' + str(i)]
-
         # contextual features
         if Xc is not None:
             Ns = len(np.atleast_1d(Xc[0]))
             s_labels = ["context_" + str(i) for i in range(Ns)]
             f_labels += s_labels
-
         return f_labels
 
 
@@ -1178,12 +1113,10 @@ class FeatureRepMix(_BaseComposition, TransformerMixin):
     def get_params(self, deep=True):
         """
         Get parameters for this transformer.
-
         Parameters
         ----------
         deep : boolean, optional
             If True, will return the parameters for this transformer and contained transformers.
-
         Returns
         -------
         params : mapping of string to any parameter names mapped to their values.
@@ -1193,9 +1126,7 @@ class FeatureRepMix(_BaseComposition, TransformerMixin):
     def set_params(self, **kwargs):
         """
         Set the parameters of this transformer.
-
         Valid parameter keys can be listed with ``get_params()``.
-
         Returns
         -------
         self
@@ -1235,7 +1166,6 @@ class FeatureRepMix(_BaseComposition, TransformerMixin):
     def fit(self, X, y=None):
         """
         Fit the transform
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -1243,7 +1173,6 @@ class FeatureRepMix(_BaseComposition, TransformerMixin):
         y : None
             There is no need of a target in a transformer, yet the pipeline API requires this
             parameter.
-
         Returns
         -------
         self : object
@@ -1251,19 +1180,16 @@ class FeatureRepMix(_BaseComposition, TransformerMixin):
         """
         Xt, Xc = get_ts_data_parts(X)
         self.f_labels = []
-
         # calculated features (prefix with the FeatureRep name and correct the index)
         for name, trans, cols in self.transformers:
             indices = self._retrieve_indices(cols)
             trans.fit(self._select(Xt, cols))
             for label, index in zip(trans.f_labels, indices):
                 self.f_labels.append(name + '_' + label.rsplit('_', 1)[0] + '_' + str(index))
-
         # contextual features
         if Xc is not None:
             Ns = len(np.atleast_1d(Xc[0]))
             self.f_labels += ['context_' + str(i) for i in range(Ns)]
-
         return self
 
     def _validate(self):
@@ -1272,15 +1198,11 @@ class FeatureRepMix(_BaseComposition, TransformerMixin):
         """
         if self.f_labels is None:
             raise NotFittedError('FeatureRepMix')
-
         if not self.transformers:
             return
-
         names, transformers, _ = zip(*self.transformers)
-
         # validate names
         self._validate_names(names)
-
         # validate transformers
         for trans in transformers:
             if not isinstance(trans, FeatureRep):
@@ -1291,37 +1213,30 @@ class FeatureRepMix(_BaseComposition, TransformerMixin):
         """
         Transform the segmented time series data into feature data.
         If contextual data is included in X, it is returned with the feature data.
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
             Segmented time series data and (optionally) contextual data
-
         Returns
         -------
         X_new : array shape [n_series, ...]
             Feature representation of segmented time series data and contextual data
-
         """
         self._validate()
-
         Xt, Xc = get_ts_data_parts(X)
         check_array(Xt, dtype='numeric', ensure_2d=False, allow_nd=True)
-
         # calculated features
         fts = np.column_stack([trans.transform(self._select(Xt, cols))
                                for _, trans, cols in self.transformers])
         # contextual features
         if Xc is not None:
             fts = np.column_stack([fts, Xc])
-
         return fts
 
 
 class FunctionTransformer(BaseEstimator, TransformerMixin):
     """
     Transformer for applying a custom function to time series data.
-
     Parameters
     ----------
     func : function, optional (default=None)
@@ -1329,15 +1244,12 @@ class FunctionTransformer(BaseEstimator, TransformerMixin):
         passed through unaltered) - X remains unchanged if no function is supplied
     func_kwargs : dictionary, optional (default={})
         keyword arguments to be passed to the function call
-
     Returns
     -------
     self : object
         returns self
-
     Examples
     --------
-
     >>> from seglearn.transform import FunctionTransformer
     >>> import numpy as np
     >>>
@@ -1350,9 +1262,7 @@ class FunctionTransformer(BaseEstimator, TransformerMixin):
     >>>     np.array([False, True, False])]
     >>> trans = FunctionTransformer(choose_cols, func_kwargs={"cols":[0,1]})
     >>> X = trans.fit_transform(X, y)
-
     """
-
     def __init__(self, func=None, func_kwargs={}):
         self.func = func
         self.func_kwargs = func_kwargs
@@ -1360,14 +1270,12 @@ class FunctionTransformer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """
         Fit the transform
-
         Parameters
         ----------
         X : array-like, shape [n_samples, ...]
             time series data and (optionally) contextual data
         y : None
             there is no need of a target in a transformer, yet the pipeline API requires this
-
         Returns
         -------
         self : object
@@ -1380,17 +1288,14 @@ class FunctionTransformer(BaseEstimator, TransformerMixin):
         """
         Transforms the time series data based on the provided function. Note this transformation
         must not change the number of samples in the data.
-
         Parameters
         ----------
         X : array-like, shape [n_samples, ...]
             time series data and (optionally) contextual data
-
         Returns
         -------
         Xt : array-like, shape [n_samples, ...]
             transformed time series data
-
         """
         if self.func is None:
             return X
