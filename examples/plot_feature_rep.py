@@ -39,12 +39,10 @@ clf = Pype([('segment', Segment()),
             ('scaler', StandardScaler()),
             ('rf', RandomForestClassifier(n_estimators=20))])
 
-# split the data
+# split the data and this is most outside index split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
-
 clf.fit(X_train, y_train)
 score = clf.score(X_test, y_test)
-
 print("N series in train: ", len(X_train))
 print("N series in test: ", len(X_test))
 print("N segments in train: ", clf.N_train)

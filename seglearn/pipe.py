@@ -318,10 +318,9 @@ class Pype(Pipeline):
 
     def predict_unsegmented(self, X, categorical_target=False):
         """
-        Generates predictions for each time series on the same sampling as the original series, by resampling
-        a prediction performed with sliding window segmentation.
-        Requires that one of the Segment transforms be part of the pipeline.
-        See plot_feature_rep.py example.
+        Generates predictions for each time series on the same sampling as the original series,
+        by resampling a prediction performed with sliding window segmentation. Requires that one 
+        of the Segment transforms be part of the pipeline. See plot_feature_rep.py example.
         Parameters
         ----------
         X : iterable

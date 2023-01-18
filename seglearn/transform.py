@@ -17,8 +17,8 @@ from .base import TS_Data
 from .feature_functions import base_features
 from .util import get_ts_data_parts, check_ts_data, interp_sort
 
-__all__ = ['Segment', 'SegmentX', 'SegmentXY', 'SegmentXYForecast', 'PadTrunc', 'InterpLongToWide', 'Interp',
-           'FeatureRep', 'FeatureRepMix', 'FunctionTransformer']
+__all__ = ['Segment', 'SegmentX', 'SegmentXY', 'SegmentXYForecast', 'PadTrunc', 'InterpLongToWide',
+           'Interp', 'FeatureRep', 'FeatureRepMix', 'FunctionTransformer']
 
 
 class XyTransformerMixin(object):
@@ -94,17 +94,12 @@ class Segment(BaseEstimator, XyTransformerMixin):
     X is time series data, optionally with contextual variables
     and y can either have a single value for each time series or
     itself be a time series with the same sampling interval as X
-
     The target y is mapped to segments from their parent series.
-
     If the target y is a time_series, the optional parameter y_func
     determines the mapping behavior. The segment targets can be a single value,
     or a sequence of values depending on ``y_func`` parameter.
-
     The transformed data consists of segment/target pairs that can be learned
     through a feature representation or directly with a neural network.
-
-
     Parameters
     ----------
     width : int > 0
@@ -127,13 +122,11 @@ class Segment(BaseEstimator, XyTransformerMixin):
         index changes slowest) and 'F' means Fortran-like index order (last index changes slowest).
         'C' ordering is suggested for neural network estimators, and 'F' ordering is suggested for computing
         feature representations.
-
     Returns
     -------
     self : object
         Returns self.
     """
-
     def __init__(self, width=100, overlap=0.5, step=None, y_func=last, shuffle=False,
                  random_state=None, order='F'):
         self.width = width
@@ -167,7 +160,6 @@ class Segment(BaseEstimator, XyTransformerMixin):
     def fit(self, X, y=None):
         """
         Fit the transform
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -177,7 +169,6 @@ class Segment(BaseEstimator, XyTransformerMixin):
             this parameter.
         shuffle : bool
             Shuffles data after transformation
-
         Returns
         -------
         self : object
@@ -191,8 +182,6 @@ class Segment(BaseEstimator, XyTransformerMixin):
         Transforms the time series data into segments (temporal tensor)
         Note this transformation changes the number of samples in the data
         If y and sample_weight are provided, they are transformed to align to the new samples
-
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -201,7 +190,6 @@ class Segment(BaseEstimator, XyTransformerMixin):
             target vector
         sample_weight : array-like shape [n_series], default = None
             sample weights
-
         Returns
         -------
         Xt : array-like, shape [n_segments, ]
@@ -214,25 +202,19 @@ class Segment(BaseEstimator, XyTransformerMixin):
         ts_target = check_ts_data(X, y)
         Xt, Nt = self._segmentX(X)
         yt = y
-
         if yt is not None:
             yt = self._segmentY(y, Nt, ts_target)
-
         swt = sample_weight
-
         if swt is not None:
             swt = expand_variables_to_segments(swt, Nt).ravel()
-
         if self.shuffle is True:
             check_random_state(self.random_state)
             return shuffle_data(Xt, yt, swt)
-
         return Xt, yt, swt
 
     def _segmentX(self, X):
         Xt, Xc = get_ts_data_parts(X)
         N = len(Xt)  # number of time series
-
         if Xt[0].ndim > 1:
             Xt = np.array([sliding_tensor(Xt[i], self.width, self._step, self.order)
                            for i in np.arange(N)], dtype=object)
@@ -242,11 +224,9 @@ class Segment(BaseEstimator, XyTransformerMixin):
 
         Nt = [len(Xt[i]) for i in np.arange(len(Xt))]
         Xt = np.concatenate(Xt).astype(float)
-
         if Xc is not None:
             Xc = expand_variables_to_segments(Xc, Nt)
             Xt = TS_Data(Xt, Xc)
-
         return Xt, Nt
 
     def _segmentY(self, y, Nt, ts_target=False):
@@ -299,13 +279,11 @@ class SegmentX(Segment):
     ----
     separate fit and predict overlap parameters
     """
-
     def __init__(self, width=100, overlap=0.5, step=None, shuffle=False, random_state=None,
                  order='F'):
 
         super().__init__(width=width, overlap=overlap, step=step, shuffle=shuffle, random_state=random_state,
                          order=order)
-
         warnings.warn("deprecated, use Segment class", DeprecationWarning)
 
 
@@ -367,15 +345,12 @@ class SegmentXY(Segment):
 class SegmentXYForecast(Segment):
     """
     Forecast sliding window segmentation for time series or sequence datasets
-
     The target y is mapped to segments from their parent series,
     using the ``forecast`` and ``y_func`` parameters to determine the mapping behavior.
     The segment targets can be a single value, or a sequence of values
     depending on ``y_func`` parameter.
-
     The transformed data consists of segment/target pairs that can be learned
     through a feature representation or directly with a neural network.
-
     Parameters
     ----------
     width : int > 0
@@ -400,7 +375,6 @@ class SegmentXYForecast(Segment):
         index changes slowest) and 'F' means Fortran-like index order (last index changes slowest).
         'C' ordering is suggested for neural network estimators, and 'F' ordering is suggested for computing
         feature representations.
-
     Returns
     -------
     self : object
@@ -412,10 +386,8 @@ class SegmentXYForecast(Segment):
 
         super().__init__(width=width, overlap=overlap, step=step, shuffle=shuffle, random_state=random_state,
                          order=order)
-
         if not forecast >= 1:
             raise ValueError("forecast must be >=1 (was %d)" % forecast)
-
         self.y_func = y_func
         self.forecast = forecast
 
@@ -425,7 +397,6 @@ class SegmentXYForecast(Segment):
         Forecast sliding window segmentation for time series or sequence datasets.
         Note this transformation changes the number of samples in the data.
         Currently sample weights always returned as None.
-
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -434,7 +405,6 @@ class SegmentXYForecast(Segment):
             target vector
         sample_weight : array-like shape [n_series], default = None
             sample weights
-
         Returns
         -------
         X_new : array-like, shape [n_segments, ]
@@ -447,41 +417,32 @@ class SegmentXYForecast(Segment):
         check_ts_data(X, y)
         Xt, Xc = get_ts_data_parts(X)
         yt = y
-
         # if only one time series is learned
         if len(Xt[0]) == 1:
             Xt = [Xt]
-
         N = len(Xt)  # number of time series
-
         if Xt[0].ndim > 1:
             Xt = np.array([sliding_tensor(Xt[i], self.width + self.forecast, self._step, self.order)
                            for i in np.arange(N)], dtype=object)
         else:
             Xt = np.array([sliding_window(Xt[i], self.width + self.forecast, self._step, self.order)
                            for i in np.arange(N)], dtype=object)
-
         Nt = [len(Xt[i]) for i in np.arange(len(Xt))]
         Xt = np.concatenate(Xt).astype(float)
-
         # todo: implement advance X
         Xt = Xt[:, 0:self.width]
-
         if Xc is not None:
             Xc = expand_variables_to_segments(Xc, Nt)
             Xt = TS_Data(Xt, Xc)
-
         if yt is not None:
             yt = np.array([sliding_window(yt[i], self.width + self.forecast, self._step, self.order)
                            for i in np.arange(N)], dtype=object)
             yt = np.concatenate(yt).astype(float)
             yt = yt[:, self.width:(self.width + self.forecast)]  # target y
             yt = self.y_func(yt)
-
         if self.shuffle is True:
             check_random_state(self.random_state)
             Xt, yt, _ = shuffle_data(Xt, yt)
-
         return Xt, yt, None
 
 
