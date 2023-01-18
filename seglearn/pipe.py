@@ -17,10 +17,8 @@ class Pype(Pipeline):
     """
     This pipeline extends the sklearn Pipeline to support transformers that change X, y,
     sample_weight, and the number of samples.
-
     It also adds some new options for setting hyper-parameters with callables and in reference to
     other parameters (see examples).
-
     Parameters
     ----------
     steps : list
@@ -28,15 +26,12 @@ class Pype(Pipeline):
         order in which they are chained, with the last object an estimator.
     scorer : sklearn scorer object
     memory : currently not implemented
-
     Attributes
     ----------
     N_train : number of training samples - available after calling fit method
     N_test : number of testing samples - available after calling predict, or score methods
-
     Examples
     --------
-
     >>> from seglearn.transform import FeatureRep, SegmentX
     >>> from seglearn.pipe import Pype
     >>> from seglearn.datasets import load_watch
@@ -51,7 +46,6 @@ class Pype(Pipeline):
     >>>              ('rf', RandomForestClassifier())])
     >>> pipe.fit(X, y)
     >>> print(pipe.score(X, y))
-
     """
 
     # todo: handle steps with None
@@ -69,7 +63,6 @@ class Pype(Pipeline):
 
         Fit all the transforms one after the other and transform the
         data, then fit the transformed data using the final estimator.
-
         Parameters
         ----------
         X : iterable
@@ -82,37 +75,29 @@ class Pype(Pipeline):
             Parameters passed to the ``fit`` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
-
         Returns
         -------
         self : Pipeline
             This estimator
         """
         Xt, yt, fit_params = self._fit(X, y, **fit_params)
-
         self.N_train = len(yt)
-
         if self._final_estimator is not None:
             fitres = self._final_estimator.fit(Xt, yt, **fit_params)
             if hasattr(fitres, 'history'):
                 self.history = fitres
-
         return self
 
     def _fit(self, X, y=None, **fit_params):
         self.steps = list(self.steps)
         self._validate_steps()
-
         fit_params_steps = dict((name, {}) for name, step in self.steps
                                 if step is not None)
-
         for pname, pval in fit_params.items():
             step, param = pname.split('__', 1)
             fit_params_steps[step][param] = pval
-
         Xt = X
         yt = y
-
         # iterate through all but last
         for step_idx, (name, transformer) in enumerate(self.steps[:-1]):
             if transformer is None:
@@ -124,7 +109,6 @@ class Pype(Pipeline):
                                                           **fit_params_steps[name])
                 else:
                     Xt = transformer.fit_transform(Xt, yt, **fit_params_steps[name])
-
         if self._final_estimator is None:
             return Xt, yt, {}
         return Xt, yt, fit_params_steps[self.steps[-1][0]]
@@ -133,13 +117,11 @@ class Pype(Pipeline):
         Xt = X
         yt = y
         swt = sample_weight
-
         for name, transformer in self.steps[:-1]:  # iterate through all but last
             if isinstance(transformer, XyTransformerMixin):
                 Xt, yt, swt = transformer.transform(Xt, yt, swt)
             else:
                 Xt = transformer.transform(Xt)
-
         return Xt, yt, swt
 
     def transform(self, X, y=None):
@@ -147,7 +129,6 @@ class Pype(Pipeline):
         Apply transforms, and transform with the final estimator
         This also works where final estimator is ``None``: all prior
         transformations are applied.
-
         Parameters
         ----------
         X : iterable
@@ -155,7 +136,6 @@ class Pype(Pipeline):
             of the pipeline.
         y : array-like
             Target
-
         Returns
         -------
         Xt : array-like, shape = [n_samples, n_transformed_features]
@@ -164,12 +144,10 @@ class Pype(Pipeline):
             Transformed target
         """
         Xt, yt, _ = self._transform(X, y)
-
         if isinstance(self._final_estimator, XyTransformerMixin):
             Xt, yt, _ = self._final_estimator.transform(Xt, yt)
         else:
             Xt = self._final_estimator.transform(Xt)
-
         return Xt, yt
 
     def fit_transform(self, X, y=None, **fit_params):
@@ -178,7 +156,6 @@ class Pype(Pipeline):
         Fits all the transforms one after the other and transforms the
         data, then uses fit_transform on transformed data with the final
         estimator.
-
         Parameters
         ----------
         X : iterable
@@ -191,7 +168,6 @@ class Pype(Pipeline):
             Parameters passed to the ``fit`` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
-
         Returns
         -------
         Xt : array-like, shape = [n_samples, n_transformed_features]
@@ -199,9 +175,7 @@ class Pype(Pipeline):
         yt : array-like, shape = [n_samples]
             Transformed target
         """
-
         Xt, yt, fit_params = self._fit(X, y, **fit_params)
-
         if isinstance(self._final_estimator, XyTransformerMixin):
             Xt, yt, _ = self._final_estimator.fit_transform(Xt, yt)
         else:
@@ -210,21 +184,17 @@ class Pype(Pipeline):
             else:
                 self._final_estimator.fit(Xt, yt)
                 Xt = self._final_estimator.transform(Xt)
-
         self.N_fit = len(yt)
-
         return Xt, yt
 
     def predict(self, X):
         """
         Apply transforms to the data, and predict with the final estimator
-
         Parameters
         ----------
         X : iterable
             Data to predict on. Must fulfill input requirements of first step
             of the pipeline.
-
         Returns
         -------
         yp : array-like
@@ -237,7 +207,6 @@ class Pype(Pipeline):
         """
         Apply transforms to the data, and predict with the final estimator.
         Unlike predict, this also returns the transformed target
-
         Parameters
         ----------
         X : iterable
@@ -245,7 +214,6 @@ class Pype(Pipeline):
             of the pipeline.
         y : array-like
             target
-
         Returns
         -------
         yt : array-like
@@ -260,7 +228,6 @@ class Pype(Pipeline):
     def score(self, X, y=None, sample_weight=None):
         """
         Apply transforms, and score with the final estimator
-
         Parameters
         ----------
         X : iterable
@@ -272,35 +239,27 @@ class Pype(Pipeline):
         sample_weight : array-like, default=None
             If not None, this argument is passed as ``sample_weight`` keyword
             argument to the ``score`` method of the final estimator.
-
         Returns
         -------
         score : float
         """
-
         Xt, yt, swt = self._transform(X, y, sample_weight)
-
         self.N_test = len(yt)
-
         score_params = {}
         if swt is not None:
             score_params['sample_weight'] = swt
-
         if self.scorer is None:
             return self._final_estimator.score(Xt, yt, **score_params)
-
         return self.scorer(self._final_estimator, Xt, yt, **score_params)
 
     def predict_proba(self, X):
         """
         Apply transforms, and predict_proba of the final estimator
-
         Parameters
         ----------
         X : iterable
             Data to predict on. Must fulfill input requirements of first step
             of the pipeline.
-
         Returns
         -------
         y_proba : array-like, shape = [n_samples, n_classes]
@@ -312,13 +271,11 @@ class Pype(Pipeline):
     def decision_function(self, X):
         """
         Apply transforms, and decision_function of the final estimator
-
         Parameters
         ----------
         X : iterable
             Data to predict on. Must fulfill input requirements of first step
             of the pipeline.
-
         Returns
         -------
         y_score : array-like, shape = [n_samples, n_classes]
@@ -329,13 +286,11 @@ class Pype(Pipeline):
     def predict_log_proba(self, X):
         """
         Apply transforms, and predict_log_proba of the final estimator
-
         Parameters
         ----------
         X : iterable
             Data to predict on. Must fulfill input requirements of first step
             of the pipeline.
-
         Returns
         -------
         y_score : array-like, shape = [n_samples, n_classes]
@@ -343,17 +298,14 @@ class Pype(Pipeline):
         Xt, _, _ = self._transform(X)
         return self._final_estimator.predict_log_proba(Xt)
 
-
     def predict_as_series(self, X):
         """
         Returns predictions in a list, grouping predictions based on the series they were derived from
-
         Parameters
         ----------
         X : iterable
             Data to predict on. Must fulfill input requirements of first step
             of the pipeline.
-
         Returns
         -------
         yp : list
@@ -364,84 +316,64 @@ class Pype(Pipeline):
         yp = [yp[ixp == i] for i in ix]
         return np.array(yp, dtype=object)
 
-
     def predict_unsegmented(self, X, categorical_target=False):
         """
         Generates predictions for each time series on the same sampling as the original series, by resampling
-        a prediction performed with sliding window segmentation
-
-        Requires that one of the Segment transforms be part of the pipeline
-
-        See plot_feature_rep.py example
-
+        a prediction performed with sliding window segmentation.
+        Requires that one of the Segment transforms be part of the pipeline.
+        See plot_feature_rep.py example.
         Parameters
         ----------
         X : iterable
             Data to predict on. Must fulfill input requirements of first step
             of the pipeline.
-
         categorical_target : boolean
             Set to True for classification problems, and false for regression problems
-
         Returns
         -------
         yp : iterable
             Time series predictions on the same sampling as X
-
         """
         segmenter = self._get_segmenter()
-
         if not segmenter:
             raise Exception("Pype does not contain valid segmenter transform")
-
         width = segmenter.width
         step = segmenter._step
-
         yp = self.predict_as_series(X)
         yu = []
-
         for i, yi in enumerate(yp):
             yui = segmented_prediction_to_series(yi, step, width, categorical_target)
             d = len(X[i]) - len(yui)
             if d > 0:
                 yui = np.concatenate([yui, np.repeat(yui[-1:], d)], axis=0)
             yu.append(yui)
-
         return np.array(yu, dtype=object)
-
 
     def _get_segmenter(self):
         for name, transformer in self.steps[:-1]:  # iterate through all but last
             if isinstance(transformer, Segment):
                 return transformer
 
-
     def set_params(self, **params):
         """
         Set the parameters of this estimator.
         Valid parameter keys can be listed with ``get_params()``.
-
         Returns
         -------
         self
         """
         items = self.steps
         names, _ = zip(*items)
-
         keys = list(params.keys())
-
         for name in keys:
             if '__' not in name and name in names:
                 # replace an estimator
                 self._replace_estimator('steps', name, params.pop(name))
-
             if callable(params[name]):
                 # use a callable or function to set parameters
                 params[name] = params[name](params)
-
             elif params[name] in keys:
                 # set one arg from another
                 params[name] = params[params[name]]
-
         BaseEstimator.set_params(self, **params)
         return self
