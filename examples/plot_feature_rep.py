@@ -69,6 +69,7 @@ plt.show()
 
 # let's try some context data
 Xc = np.column_stack((data['side'], data['subject']))
+# set dtype=object to allow uneven length between elements of list to be in nd_array
 Xt = np.array(data['X'], dtype=object)
 X = TS_Data(Xt, Xc)
 y = np.array(data['y'])
