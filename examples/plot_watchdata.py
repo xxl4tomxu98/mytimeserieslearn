@@ -3,7 +3,9 @@
 Working with Time Series Data
 =============================
 
-This example shows how to load the included smartwatch inertial sensor dataset, and create time series data objects compatible with the `seglearn` pipeline.
+This example shows how to load the included smartwatch inertial sensor
+dataset, and create time series data objects compatible with the
+`seglearn` pipeline.
 
 """
 # Author: David Burns
@@ -45,7 +47,8 @@ print("DATA STATS - BY CLASS")
 print(pd.DataFrame(results['by_class']))
 
 # plot an instance from the data set
-# this plot shows 6-axis inertial sensor data recorded by someone doing shoulder pendulum exercise
+# this plot shows 6-axis inertial sensor data recorded by someone doing
+# shoulder pendulum exercise
 Xt0 = Xt[0]
 f, axes = plt.subplots(nrows=1, ncols=2)
 t = np.arange(len(Xt0)) / fs

@@ -3,7 +3,9 @@
 Linear Discriminant Analysis
 ============================
 
-This example demonstrates how the pipeline can be used to perform transformation of time series data, such as linear discriminant analysis for visualization purposes
+This example demonstrates how the pipeline can be used to perform
+transformation of time series data, such as linear discriminant
+analysis for visualization purposes
 """
 
 # Author: David Burns
@@ -34,6 +36,7 @@ def plot_embedding(emb, y, y_labels):
     plt.xticks([]), plt.yticks([])
     plt.legend()
     plt.tight_layout()
+    plt.show()
 
 
 # load the data
@@ -48,4 +51,3 @@ clf = sgl.Pype([('segment', sgl.Segment()),
 
 X2, y2 = clf.fit_transform(X, y)
 plot_embedding(X2, y2.astype(int), data['y_labels'])
-plt.show()

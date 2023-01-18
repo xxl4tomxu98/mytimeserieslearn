@@ -97,7 +97,7 @@ class TemporalKFold(object):
             for j in range(Ns):
                 Njs = int(len(Xt[j]) / self.n_splits)
                 Xt_new.append(Xt[j][(Njs * i):(Njs * (i + 1))])
-        Xt_new = np.array(Xt_new)
+        Xt_new = np.array(Xt_new, dtype=object)
 
         if len(np.atleast_1d(y[0])) == len(Xt[0]):
             # y is a time series

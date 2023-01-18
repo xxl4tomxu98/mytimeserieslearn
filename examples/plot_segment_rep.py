@@ -3,7 +3,8 @@
 Classifying Segments Directly with a Neural Network
 ===================================================
 
-This is a basic example using a convolutional recurrent neural network to learn segments directly from time series data
+This is a basic example using a convolutional recurrent neural network to
+learn segments directly from time series data
 
 """
 # Author: David Burns
@@ -26,7 +27,8 @@ def crnn_model(width=100, n_vars=6, n_classes=7, conv_kernel_size=5,
     input_shape = (width, n_vars)
     model = Sequential()
     model.add(Conv1D(filters=conv_filters, kernel_size=conv_kernel_size,
-                     padding='valid', activation='relu', input_shape=input_shape))
+                     padding='valid', activation='relu',
+                     input_shape=input_shape))
     model.add(Conv1D(filters=conv_filters, kernel_size=conv_kernel_size,
                      padding='valid', activation='relu'))
     model.add(LSTM(units=lstm_units, dropout=0.1, recurrent_dropout=0.1))
@@ -45,10 +47,12 @@ y = data['y']
 
 # create a segment learning pipeline
 pipe = Pype([('seg', Segment(width=100, step=100, order='C')),
-             ('crnn', KerasClassifier(build_fn=crnn_model, epochs=1, batch_size=256, verbose=0))])
+             ('crnn', KerasClassifier(build_fn=crnn_model, epochs=1,
+                                      batch_size=256, verbose=0))])
 
 # split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25,
+                                                    random_state=42)
 
 
 pipe.fit(X_train, y_train)

@@ -3,13 +3,14 @@
 Basic Feature Representation Classification Pipeline
 ====================================================
 
-This is a basic example using the pipeline to learn a feature representation of the time series data
+This is a basic example using the pipeline to learn a feature representation
+of the time series data
 
 """
 # Author: David Burns
 # License: BSD
 
-import matplotlib.image as mpimg
+# import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -51,7 +52,8 @@ print("Accuracy score: ", score)
 
 # lets make a pretend series with different activities
 X_series = np.concatenate(X_test[1:4], axis=0)
-y_series = np.concatenate([np.full(len(X_test[i]), y_test[i]) for i in range(1, 4)])
+y_series = np.concatenate([np.full(len(X_test[i]), y_test[i])
+                           for i in range(1, 4)])
 print("Pretend series y values: ", y_test[1:4])
 
 # plot the prediction
@@ -67,7 +69,8 @@ plt.show()
 
 # let's try some context data
 Xc = np.column_stack((data['side'], data['subject']))
-# set dtype=object to allow uneven length between elements of list to be in nd_array
+# set dtype=object to allow uneven length between elements of list to
+# be in nd_array
 Xt = np.array(data['X'], dtype=object)
 X = TS_Data(Xt, Xc)
 y = np.array(data['y'])

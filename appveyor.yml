@@ -8,6 +8,12 @@ environment:
       NUMPY_VERSION: "*"
       SCIPY_VERSION: "*"
       SKLEARN_VERSION: "*"
+    - PYTHON: "/home/tomxu/.pyenv/shims/python"
+      PYTHON_VERSION: "3.9.x"
+      PYTHON_ARCH: "64"
+      NUMPY_VERSION: "*"
+      SCIPY_VERSION: "*"
+      SKLEARN_VERSION: "*"
 
 install:
   # Prepend miniconda installed Python to the PATH of this build

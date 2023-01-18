@@ -3,7 +3,8 @@
 Hyperparameter Selection 2
 ==========================
 
-This example demonstrates how to do model selection in a pipeline where segments are learned directly by a neural network
+This example demonstrates how to do model selection in a pipeline where
+segments are learned directly by a neural network
 """
 
 # Author: David Burns
@@ -28,11 +29,13 @@ def crnn_model(width=100, n_vars=6, n_classes=7, conv_kernel_size=5,
     input_shape = (width, n_vars)
     model = Sequential()
     model.add(Conv1D(filters=conv_filters, kernel_size=conv_kernel_size,
-                     padding='valid', activation='relu', input_shape=input_shape))
+                     padding='valid', activation='relu',
+                     input_shape=input_shape))
     model.add(LSTM(units=lstm_units, dropout=0.1, recurrent_dropout=0.1))
     model.add(Dense(n_classes, activation="softmax"))
 
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='adam', metrics=['accuracy'])
 
     return model
 
@@ -48,14 +51,15 @@ Xs, ys, cv = splitter.split(X, y)
 
 # create a segment learning pipeline
 pipe = Pype([('seg', Segment(order='C')),
-             ('crnn', KerasClassifier(build_fn=crnn_model, epochs=1, batch_size=256, verbose=0))])
+             ('crnn', KerasClassifier(build_fn=crnn_model, epochs=1,
+                                      batch_size=256, verbose=0))])
 
 # create a parameter dictionary using the sklearn API
-#
-# you can also set a parameter to be always equal to another parameter, by setting its value to
+# you can also set a parameter to be always equal to another parameter,
+# by setting its value to
 # parameter name to track (this is an extension from sklearn)
-#
-# note that if you want to set a parameter to a single value, it will still need to be as a list
+# note that if you want to set a parameter to a single value,
+# it will still need to be as a list
 
 par_grid = {'seg__width': [100, 200, 400],
             'seg__overlap': [0.],
@@ -70,5 +74,6 @@ plt.plot(par_grid['seg__width'], scores, '-o')
 plt.title("Grid Search Scores")
 plt.xlabel("Width [s]")
 plt.ylabel("CV Average Score")
-plt.fill_between(par_grid['seg__width'], scores - stds, scores + stds, alpha=0.2, color='navy')
+plt.fill_between(par_grid['seg__width'], scores - stds,
+                 scores + stds, alpha=0.2, color='navy')
 plt.show()

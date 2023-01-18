@@ -3,7 +3,8 @@
 Continuous Target and Time Series Regression
 ============================================
 
-In this example, we use the pipeline to learn a continuous time series target with a regressor
+In this example, we use the pipeline to learn a continuous time series target
+with a regressor
 
 """
 # Author: David Burns
@@ -12,24 +13,25 @@ In this example, we use the pipeline to learn a continuous time series target wi
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
+# import pandas as pd
 from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import cross_validate
+# from sklearn.model_selection import cross_validate
 
 from seglearn.pipe import Pype
-from seglearn.split import temporal_split, TemporalKFold
+from seglearn.split import temporal_split
 from seglearn.transform import FeatureRep, Segment, last
 
 # for a single time series, we need to make it a list
 X = [np.arange(10000) / 100.]
 y = [np.sin(X[0]) * X[0] * 3 + X[0] * X[0]]
 
-# split the data along the time axis (our only option since we have only 1 time series)
+# split the data along the time axis (our only option since we have only
+# 1 time series)
 X_train, X_test, y_train, y_test = temporal_split(X, y)
 
-# setting y_func = last, selects the last value from each y segment as the target
-# other options include transform.middle, or you can make your own function
-# see the API documentation for further details
+# setting y_func = last, selects the last value from each y segment as the
+# target other options include transform.middle, or you can make your own
+# function see the API documentation for further details
 
 pipe = Pype([('seg', Segment(width=200, overlap=0.5, y_func=last)),
              ('features', FeatureRep()),

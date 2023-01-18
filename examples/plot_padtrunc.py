@@ -3,8 +3,8 @@
 Pipeline using Time Series Padding and Truncation
 =================================================
 
-This is a basic example using the pipeline to learn a feature representation of the time series data
-using padding and truncation instead of sliding window segmentation.
+This is a basic example using the pipeline to learn a feature representation of
+a time series by padding and truncation instead of sliding window segmentation.
 
 """
 # Author: David Burns
@@ -36,7 +36,8 @@ pipe = Pype([('trunc', PadTrunc(width=250)),
              ('svc', LinearSVC())])
 
 # split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True,
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25,
+                                                    shuffle=True,
                                                     random_state=42)
 
 pipe.fit(X_train, y_train)

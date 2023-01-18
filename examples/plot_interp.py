@@ -4,9 +4,8 @@ Resampling Time Series Data
 ===========================
 
 This is a basic example using the pipeline to learn resample a time series
-
-This may be useful for resampling irregularly sampled time series, or for determining
-an optimal sampling frequency for the data
+This may be useful for resampling irregularly sampled time series, or for
+determining an optimal sampling frequency for the data
 
 """
 # Author: David Burns
@@ -39,9 +38,10 @@ data = load_watch()
 X = data['X']
 y = data['y']
 
-# I am adding in a column to represent time (50 Hz sampling), since my data doesn't include it
-# the Interp class assumes time is the first column in the series
-X = np.array([np.column_stack([np.arange(len(X[i])) / 50., X[i]]) for i in np.arange(len(X))])
+# I am adding in a column to represent time (50 Hz sampling), since my data
+# doesn't include it. the Interp class assumes time first column in the series
+X = np.array([np.column_stack([np.arange(len(X[i])) / 50., X[i]])
+              for i in np.arange(len(X))], dtype=object)
 
 clf = Pype([('interp', Interp(1. / 25., categorical_target=True)),
             ('segment', Segment(width=100)),
@@ -66,7 +66,7 @@ print("Accuracy score: ", score)
 splitter = TemporalKFold(n_splits=3)
 Xs, ys, cv = splitter.split(X, y)
 
-# here we use a callable parameter to force the segmenter width to equal 2 seconds
+# here we use a callable parameter to force the segmenter width to 2 seconds
 # note this is an extension of the sklearn api for setting class parameters
 par_grid = {'interp__sample_period': [1. / 5., 1. / 10., 1. / 25., 1. / 50.],
             'segment__width': [calc_segment_width]}
@@ -80,6 +80,6 @@ plt.plot(par_grid['interp__sample_period'], scores, '-o')
 plt.title("Grid Search Scores")
 plt.xlabel("Sample Period [s]")
 plt.ylabel("CV Average Score")
-plt.fill_between(par_grid['interp__sample_period'], scores - stds, scores + stds, alpha=0.2,
-                 color='navy')
+plt.fill_between(par_grid['interp__sample_period'], scores - stds,
+                 scores + stds, alpha=0.2, color='navy')
 plt.show()
