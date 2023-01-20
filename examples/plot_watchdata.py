@@ -2,7 +2,6 @@
 =============================
 Working with Time Series Data
 =============================
-
 This example shows how to load the included smartwatch inertial sensor
 dataset, and create time series data objects compatible with the
 `seglearn` pipeline.
@@ -14,19 +13,16 @@ dataset, and create time series data objects compatible with the
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
 from seglearn.base import TS_Data
 from seglearn.datasets import load_watch
 from seglearn.util import check_ts_data, ts_stats
 
 data = load_watch()
-
 y = data['y']
 Xt = data['X']
 fs = 50  # sampling frequency
 
 # create time series data object with no contextual variables
-
 check_ts_data(Xt)
 
 # create time series data object with 2 contextual variables
