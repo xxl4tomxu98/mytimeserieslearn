@@ -26,6 +26,7 @@ fs = 50  # sampling frequency
 check_ts_data(Xt)
 
 # create time series data object with 2 contextual variables
+print(len(data["side"]), len(data["subject"]), len(data["y_labels"]))
 Xs = np.column_stack([data['side'], data['subject']])
 X = TS_Data(Xt, Xs)
 check_ts_data(X)

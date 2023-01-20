@@ -75,7 +75,8 @@ steps = [('seg', Segment()),
 pipe = Pype(steps)
 
 # split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25,
+                                                    random_state=42)
 
 ##############################################
 # OPTION 1: Use the score SegPipe score method
@@ -107,22 +108,22 @@ print("CV Scores: ", pd.DataFrame(cv_scores))
 
 # model selection with scoring functions / dictionaries
 #
-# unfortunately, this is not possible withing the current framework due to how
-# scoring is implemented within the model_selection functions / classes of sklearn
-# running the code below will cause an error, because the model_selection
-# functions / classes do not have access to y_true for the segments
-#
+# unfortunately, this is not possible withing the current framework due to
+# how scoring is implemented within the model_selection functions / classes
+# of sklearn running the code below will cause an error, because the
+# model_selection functions / classes do not have access to y_true for
+# the segments
 # >>> scoring = ['accuracy','precision_macro','recall_macro','f1_macro']
-# >>> cv_scores = cross_validate(pipe, X, y, cv = 4, return_train_score=True, scoring=scoring)
-#
+# >>> cv_scores = cross_validate(pipe, X, y, cv = 4, return_train_score=True,
+#                                scoring=scoring)
 # workarounds for this issue are outlined below
 
 
 ###################################################
 # SCORING WORKAROUND 1: USE ANOTHER SCORER FUNCTION
 ###################################################
-
-# ``SegPipe`` can be initialized with a scorer callable made with sklearn.metrics.make_scorer
+# ``SegPipe`` can be initialized with a scorer callable made with
+# sklearn.metrics.make_scorer
 # this can be used to cross_validate or grid search with any 1 score
 
 scorer = make_scorer(f1_score, average='macro')
@@ -135,9 +136,8 @@ print("CV F1 Scores: ", pd.DataFrame(cv_scores))
 ##################################################
 
 # If you want to have multiple score computed, the only way is as follows
-#
-# First transform the time series data into segments and then use an sklearn Pipeline
-#
+# First transform the time series data into segments and then use an sklearn
+# Pipeline
 # The disadvantage of this is that the parameters of the segmentation cannot be
 # optimized with this approach
 
