@@ -49,7 +49,6 @@ def check_ts_data(X, y=None):
     ts_target : bool
         target (y) is a time series
     """
-
     if y is not None:
         Nx = len(X)
         Ny = len(y)
@@ -78,6 +77,8 @@ def check_ts_data_with_ts_target(X, y=None):
     """
     Checks time series data with time series target is good.
     If not raises value error.
+    Checks time series data with time series target is good.
+    If not raises value error.
     Parameters
     ----------
     X : array-like, shape [n_series, ...]
@@ -88,7 +89,6 @@ def check_ts_data_with_ts_target(X, y=None):
     if y is not None:
         Nx = len(X)
         Ny = len(y)
-
         if Nx != Ny:
             raise ValueError("Number of time series different\
                               in X (%d) and y (%d)"
@@ -127,7 +127,6 @@ def ts_stats(Xt, y, fs=1.0, class_labels=None):
     """
     check_ts_data(Xt)
     Xt, Xs = get_ts_data_parts(Xt)
-
     if Xs is not None:
         S = len(np.atleast_1d(Xs[0]))
     else:
@@ -140,18 +139,15 @@ def ts_stats(Xt, y, fs=1.0, class_labels=None):
         D = Xt[0].shape[1]
     else:
         D = 1
-
     Ti = np.array([Xt[i].shape[0] for i in range(N)], dtype=np.float64) / fs
     ic = np.array([y == i for i in range(C)])
     Tic = [Ti[ic[i]] for i in range(C)]
-
     T = np.sum(Ti)
     total = {"n_series": N, "n_classes": C, "n_TS_vars": D,
              "n_context_vars": S, "Total_Time": T,
              "Series_Time_Mean": np.mean(Ti),
              "Series_Time_Std": np.std(Ti),
              "Series_Time_Range": (np.min(Ti), np.max(Ti))}
-
     by_class = {"Class_labels": class_labels,
                 "n_series": np.array([len(Tic[i]) for i in range(C)]),
                 "Total_Time": np.array([np.sum(Tic[i]) for i in range(C)]),
@@ -174,16 +170,13 @@ def interp_sort(t, x):
     sorts time series x by timestamp t, removing duplicates in the first entry
     this is required to user the scipy interp1d methods which returns nan when
     there are duplicate values for t_min
-
     this can be removed once the scipy issue is fixed
-
     Parameters
     ----------
     t : array-like, shape [n]
         timestamps
     x : array-like, shape [n, ]
         data
-
     Returns
     -------
     t : array-like, shape [n]
@@ -193,18 +186,14 @@ def interp_sort(t, x):
     """
     if len(t) != len(x):
         raise ValueError("Interpolation time and value errors not equal")
-
     ind = np.argsort(t)
     t = t[ind]
     x = x[ind]
-
     t, ind = np.unique(t, return_index=True)
-
     if len(t) < len(x):
         warnings.warn("Interpolation time has duplicate time indices",
                       UserWarning)
         x = x[ind]
-
     return t, x
 
 
@@ -228,14 +217,12 @@ def segmented_prediction_to_series(yp, step, width, categorical_target=False):
     -------
     yt : array-like, shape [n, ]
         resampled prediction
-
     """
     # average regression predictions if highly overlapping
     if not categorical_target and step < 0.5 * width:
         mask = segmentation_mask(len(yp), step, width)
         counts = np.bincount(mask)
         yt = np.repeat(yp, width, axis=0)
-
         if yt.ndim == 1:
             yt = np.nan_to_num(np.bincount(mask, weights=yt) / counts)
         else:

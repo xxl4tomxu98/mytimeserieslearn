@@ -15,15 +15,15 @@ __all__ = ['TargetRunLengthEncoder']
 
 class TargetRunLengthEncoder(BaseEstimator, XyTransformerMixin):
     """
-    Takes a data set with a categorical target variable encoded as a time series and transforms it
-    with run length encoding (RLE) of the target variable
+    Takes a data set with a categorical target variable encoded as a time
+    series and transforms it with run length encoding (RLE) of the target variable
 
-    RLE finds contiguous runs of the same target value within the input data and derives the
-    transformed data set from the amalgum of all contiguous runs of all target classes from all
-    series in the input data.
+    RLE finds contiguous runs of the same target value within the input data and
+    derives the transformed data set from the amalgum of all contiguous runs of
+    all target classes from all series in the input data.
 
-    This is useful for generating "pure" series with no mixing of target variables from datasets
-    that encode the target variable as a series (e.g. MHEALTH and PAMAP2)
+    This is useful for generating "pure" series with no mixing of target variables
+    from datasets that encode the target variable as a series (e.g. MHEALTH and PAMAP2)
 
     Note that ``seglearn`` can handle datasets with target variables encoded as a series natively
     (using ``SegmentXY``) and so this preprocessing is not required but may be helpful for some tasks.
@@ -52,8 +52,8 @@ class TargetRunLengthEncoder(BaseEstimator, XyTransformerMixin):
         X : array-like, shape [n_series, ...]
             Time series data and (optionally) contextual data
         y : None
-            There is no need of a target in a transformer, yet the pipeline API requires
-            this parameter.
+            There is no need of a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -65,11 +65,10 @@ class TargetRunLengthEncoder(BaseEstimator, XyTransformerMixin):
 
     def transform(self, X, y, sample_weight=None):
         """
-        Transforms the time series data with run length encoding of the target variable
-        Note this transformation changes the number of samples in the data
-        If sample_weight is provided, it is transformed to align to the new target encoding
-
-
+        Transforms the time series data with run length encoding of the
+        target variable. Note this transformation changes the number of
+        samples in the data. If sample_weight is provided, it is
+        transformed to align to the new target encoding.
         Parameters
         ----------
         X : array-like, shape [n_series, ...]
@@ -78,7 +77,6 @@ class TargetRunLengthEncoder(BaseEstimator, XyTransformerMixin):
             target variable encoded as a time series
         sample_weight : array-like shape [n_series], default = None
             sample weights
-
         Returns
         -------
         Xt : array-like, shape [n_rle_series, ]
@@ -89,40 +87,32 @@ class TargetRunLengthEncoder(BaseEstimator, XyTransformerMixin):
             sample weights
         """
         check_ts_data_with_ts_target(X, y)
-
         Xt, Xc = get_ts_data_parts(X)
         N = len(Xt)  # number of time series
-
         # transformed data
         yt = []
         Xtt = []
         swt = sample_weight
         Nt = []
-
         for i in range(N):
             Xi, yi = self._transform(Xt[i], y[i])
             yt+=yi
             Xtt+=Xi
             Nt.append(len(yi)) # number of contiguous class instances
-
         if Xc is not None:
             Xct = expand_variables_to_segments(Xc, Nt)
             Xtt = TS_Data(Xtt, Xct)
-
         if sample_weight is not None:
             swt = expand_variables_to_segments(sample_weight, Nt)
-
         return Xtt, yt, swt
 
     def _rle(self, a):
         """
         rle implementation credit to Thomas Browne from his SOF post Sept 2015
-
         Parameters
         ----------
         a : array, shape[n,]
             input vector
-
         Returns
         -------
         z : array, shape[nt,]
@@ -148,11 +138,9 @@ class TargetRunLengthEncoder(BaseEstimator, XyTransformerMixin):
         p = np.append(p, len(y))
         big_enough = p[1:] - p[:-1] >= self.min_length
         Xt = []
-
         for i in range(len(y_rle)):
             if big_enough[i]:
                 Xt.append(X[p[i]:p[i+1]])
-
         yt = y_rle[big_enough].tolist()
         return Xt, yt
 

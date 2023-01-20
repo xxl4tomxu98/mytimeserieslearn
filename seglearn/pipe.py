@@ -15,15 +15,15 @@ from .util import segmented_prediction_to_series
 
 class Pype(Pipeline):
     """
-    This pipeline extends the sklearn Pipeline to support transformers that change X, y,
-    sample_weight, and the number of samples.
-    It also adds some new options for setting hyper-parameters with callables and in reference to
-    other parameters (see examples).
+    This pipeline extends the sklearn Pipeline to support transformers 
+    that change X, y, sample_weight, and the number of samples.
+    It also adds some new options for setting hyper-parameters with 
+    callables and in reference to other parameters (see examples).
     Parameters
     ----------
     steps : list
-        List of (name, transform) tuples (implementing fit/transform) that are chained, in the
-        order in which they are chained, with the last object an estimator.
+        List of (name, transform) tuples (implementing fit/transform) that are chained,
+        in the order in which they are chained, with the last object an estimator.
     scorer : sklearn scorer object
     memory : currently not implemented
     Attributes
@@ -47,7 +47,6 @@ class Pype(Pipeline):
     >>> pipe.fit(X, y)
     >>> print(pipe.score(X, y))
     """
-
     # todo: handle steps with None
     def __init__(self, steps, scorer=None, memory=None):
         self.scorer = scorer
@@ -60,7 +59,6 @@ class Pype(Pipeline):
     def fit(self, X, y=None, **fit_params):
         """
         Fit the model
-
         Fit all the transforms one after the other and transform the
         data, then fit the transformed data using the final estimator.
         Parameters
@@ -159,15 +157,15 @@ class Pype(Pipeline):
         Parameters
         ----------
         X : iterable
-            Training data. Must fulfill input requirements of first step of the
-            pipeline.
+            Training data. Must fulfill input requirements of first
+            step of the pipeline.
         y : iterable, default=None
-            Training targets. Must fulfill label requirements for all steps of
-            the pipeline.
+            Training targets. Must fulfill label requirements for
+            all steps of the pipeline.
         **fit_params : dict of string -> object
             Parameters passed to the ``fit`` method of each step, where
-            each parameter name is prefixed such that parameter ``p`` for step
-            ``s`` has key ``s__p``.
+            each parameter name is prefixed such that parameter ``p``
+            for step ``s`` has key ``s__p``.
         Returns
         -------
         Xt : array-like, shape = [n_samples, n_transformed_features]
@@ -193,8 +191,8 @@ class Pype(Pipeline):
         Parameters
         ----------
         X : iterable
-            Data to predict on. Must fulfill input requirements of first step
-            of the pipeline.
+            Data to predict on. Must fulfill input requirements of
+            first step of the pipeline.
         Returns
         -------
         yp : array-like
@@ -231,11 +229,11 @@ class Pype(Pipeline):
         Parameters
         ----------
         X : iterable
-            Data to predict on. Must fulfill input requirements of first step
-            of the pipeline.
+            Data to predict on. Must fulfill input requirements
+            of first step of the pipeline.
         y : iterable, default=None
-            Targets used for scoring. Must fulfill label requirements for all
-            steps of the pipeline.
+            Targets used for scoring. Must fulfill label requirements
+            for all steps of the pipeline.
         sample_weight : array-like, default=None
             If not None, this argument is passed as ``sample_weight`` keyword
             argument to the ``score`` method of the final estimator.
@@ -258,8 +256,8 @@ class Pype(Pipeline):
         Parameters
         ----------
         X : iterable
-            Data to predict on. Must fulfill input requirements of first step
-            of the pipeline.
+            Data to predict on. Must fulfill input requirements of
+            first step of the pipeline.
         Returns
         -------
         y_proba : array-like, shape = [n_samples, n_classes]
@@ -274,8 +272,8 @@ class Pype(Pipeline):
         Parameters
         ----------
         X : iterable
-            Data to predict on. Must fulfill input requirements of first step
-            of the pipeline.
+            Data to predict on. Must fulfill input requirements of
+            first step of the pipeline.
         Returns
         -------
         y_score : array-like, shape = [n_samples, n_classes]
@@ -289,8 +287,8 @@ class Pype(Pipeline):
         Parameters
         ----------
         X : iterable
-            Data to predict on. Must fulfill input requirements of first step
-            of the pipeline.
+            Data to predict on. Must fulfill input requirements of
+            first step of the pipeline.
         Returns
         -------
         y_score : array-like, shape = [n_samples, n_classes]
@@ -300,12 +298,13 @@ class Pype(Pipeline):
 
     def predict_as_series(self, X):
         """
-        Returns predictions in a list, grouping predictions based on the series they were derived from
+        Returns predictions in a list, grouping predictions based on the
+        series they were derived from.
         Parameters
         ----------
         X : iterable
-            Data to predict on. Must fulfill input requirements of first step
-            of the pipeline.
+            Data to predict on. Must fulfill input requirements of
+            first step of the pipeline.
         Returns
         -------
         yp : list
@@ -318,9 +317,10 @@ class Pype(Pipeline):
 
     def predict_unsegmented(self, X, categorical_target=False):
         """
-        Generates predictions for each time series on the same sampling as the original series,
-        by resampling a prediction performed with sliding window segmentation. Requires that one 
-        of the Segment transforms be part of the pipeline. See plot_feature_rep.py example.
+        Generates predictions for each time series on the same sampling
+        as the original series, by resampling a prediction performed with
+        sliding window segmentation. Requires that one of the Segment
+        transforms be part of the pipeline. See plot_feature_rep.py example.
         Parameters
         ----------
         X : iterable
