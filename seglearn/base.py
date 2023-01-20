@@ -36,7 +36,8 @@ class TS_Data(object):
 
     @classmethod
     def from_df(cls, df):
-        return cls(np.array(df['ts_data']), np.array(df.drop(columns=['ts_data'])))
+        return cls(np.array(df['ts_data']),
+                   np.array(df.drop(columns=['ts_data'])))
 
     def __iter__(self):
         return self
@@ -52,4 +53,3 @@ class TS_Data(object):
 
     def __len__(self):
         return self.N
-

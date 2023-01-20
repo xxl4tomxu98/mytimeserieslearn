@@ -2,7 +2,6 @@
 ===================================================
 Classifying Segments Directly with a Neural Network
 ===================================================
-
 This is a basic example using a convolutional recurrent neural network to
 learn segments directly from time series data
 

@@ -10,27 +10,25 @@ import warnings
 
 from seglearn.base import TS_Data
 
-__all__ = ['get_ts_data_parts', 'check_ts_data', 'check_ts_data_with_ts_target', 'ts_stats']
+__all__ = ['get_ts_data_parts', 'check_ts_data',
+           'check_ts_data_with_ts_target', 'ts_stats']
 
 
 def get_ts_data_parts(X):
     """
-    Separates time series data object into time series variables and contextual variables
-
+    Separates time series data object into time series variables
+    and contextual variables
     Parameters
     ----------
     X : array-like, shape [n_series, ...]
        Time series data and (optionally) contextual data
-
     Returns
     -------
     Xt : array-like, shape [n_series, ]
-        Time series data
+         Time series data
     Xs : array-like, shape [n_series, n_contextd = np.colum _variables]
-        contextual variables
-
+         contextual variables
     """
-
     if isinstance(X, TS_Data):
         return X.ts_data, X.context_data
     elif isinstance(X, DataFrame):
@@ -38,39 +36,36 @@ def get_ts_data_parts(X):
     else:
         return X, None
 
+
 def check_ts_data(X, y=None):
     """
     Checks time series data is good. If not raises value error.
-
     Parameters
     ----------
     X : array-like, shape [n_series, ...]
        Time series data and (optionally) contextual data
-       
     Returns
     -------
     ts_target : bool
-        target (y) is a time series      
-        
+        target (y) is a time series
     """
 
     if y is not None:
         Nx = len(X)
         Ny = len(y)
-
         if Nx != Ny:
-            raise ValueError("Number of time series different in X (%d) and y (%d)"
+            raise ValueError("Number of time series different\
+                              in X (%d) and y (%d)"
                              % (Nx, Ny))
-
         Xt, _ = get_ts_data_parts(X)
         Ntx = np.array([len(Xt[i]) for i in np.arange(Nx)])
         Nty = np.array([len(np.atleast_1d(y[i])) for i in np.arange(Nx)])
-
         if np.count_nonzero(Nty == 1) == Nx:  # all targets are single values
             return False
         elif np.count_nonzero(Nty == Ntx) == Nx:  # y is a time series
             return True
-        elif np.count_nonzero(Nty == Nty[0]) == Nx:  # target vector (eg multilabel or onehot)
+        # target vector (eg multilabel or onehot)
+        elif np.count_nonzero(Nty == Nty[0]) == Nx:
             return False
         else:
             raise ValueError("Invalid time series lengths.\n"
@@ -81,8 +76,8 @@ def check_ts_data(X, y=None):
 
 def check_ts_data_with_ts_target(X, y=None):
     """
-    Checks time series data with time series target is good. If not raises value error.
-
+    Checks time series data with time series target is good.
+    If not raises value error.
     Parameters
     ----------
     X : array-like, shape [n_series, ...]
@@ -95,13 +90,12 @@ def check_ts_data_with_ts_target(X, y=None):
         Ny = len(y)
 
         if Nx != Ny:
-            raise ValueError("Number of time series different in X (%d) and y (%d)"
+            raise ValueError("Number of time series different\
+                              in X (%d) and y (%d)"
                              % (Nx, Ny))
-
         Xt, _ = get_ts_data_parts(X)
         Ntx = np.array([len(Xt[i]) for i in np.arange(Nx)])
         Nty = np.array([len(np.atleast_1d(y[i])) for i in np.arange(Nx)])
-
         if np.count_nonzero(Nty == Ntx) == Nx:
             return
         else:
@@ -114,7 +108,6 @@ def check_ts_data_with_ts_target(X, y=None):
 def ts_stats(Xt, y, fs=1.0, class_labels=None):
     """
     Generates some helpful statistics about the data X
-
     Parameters
     ----------
     X : array-like, shape [n_series, ...]
@@ -125,15 +118,12 @@ def ts_stats(Xt, y, fs=1.0, class_labels=None):
         sampling frequency
     class_labels : list of strings, default None
         List of target class names
-
-
     Returns
     -------
     results : dict
         | Dictionary of relevant statistics for the time series data
         | results['total'] has stats for the whole data set
         | results['by_class'] has stats segragated by target class
-
     """
     check_ts_data(Xt)
     Xt, Xs = get_ts_data_parts(Xt)
@@ -142,11 +132,9 @@ def ts_stats(Xt, y, fs=1.0, class_labels=None):
         S = len(np.atleast_1d(Xs[0]))
     else:
         S = 0
-
     C = np.max(y) + 1  # number of classes
     if class_labels is None:
         class_labels = np.arange(C)
-
     N = len(Xt)
     if Xt[0].ndim > 1:
         D = Xt[0].shape[1]
@@ -158,8 +146,8 @@ def ts_stats(Xt, y, fs=1.0, class_labels=None):
     Tic = [Ti[ic[i]] for i in range(C)]
 
     T = np.sum(Ti)
-
-    total = {"n_series": N, "n_classes": C, "n_TS_vars": D, "n_context_vars": S, "Total_Time": T,
+    total = {"n_series": N, "n_classes": C, "n_TS_vars": D,
+             "n_context_vars": S, "Total_Time": T,
              "Series_Time_Mean": np.mean(Ti),
              "Series_Time_Std": np.std(Ti),
              "Series_Time_Range": (np.min(Ti), np.max(Ti))}
@@ -167,22 +155,25 @@ def ts_stats(Xt, y, fs=1.0, class_labels=None):
     by_class = {"Class_labels": class_labels,
                 "n_series": np.array([len(Tic[i]) for i in range(C)]),
                 "Total_Time": np.array([np.sum(Tic[i]) for i in range(C)]),
-                "Series_Time_Mean": np.array([np.mean(Tic[i]) for i in range(C)]),
-                "Series_Time_Std": np.array([np.std(Tic[i]) for i in range(C)]),
-                "Series_Time_Min": np.array([np.min(Tic[i]) for i in range(C)]),
-                "Series_Time_Max": np.array([np.max(Tic[i]) for i in range(C)])}
+                "Series_Time_Mean": np.array([np.mean(Tic[i])
+                                             for i in range(C)]),
+                "Series_Time_Std": np.array([np.std(Tic[i])
+                                            for i in range(C)]),
+                "Series_Time_Min": np.array([np.min(Tic[i])
+                                             for i in range(C)]),
+                "Series_Time_Max": np.array([np.max(Tic[i])
+                                             for i in range(C)])}
 
     results = {'total': total,
                'by_class': by_class}
-
     return results
+
 
 def interp_sort(t, x):
     """
     sorts time series x by timestamp t, removing duplicates in the first entry
-
-    this is required to user the scipy interp1d methods which returns nan when there are duplicate
-    values for t_min
+    this is required to user the scipy interp1d methods which returns nan when
+    there are duplicate values for t_min
 
     this can be removed once the scipy issue is fixed
 
@@ -210,7 +201,8 @@ def interp_sort(t, x):
     t, ind = np.unique(t, return_index=True)
 
     if len(t) < len(x):
-        warnings.warn("Interpolation time has duplicate time indices", UserWarning)
+        warnings.warn("Interpolation time has duplicate time indices",
+                      UserWarning)
         x = x[ind]
 
     return t, x
@@ -218,7 +210,8 @@ def interp_sort(t, x):
 
 def segmented_prediction_to_series(yp, step, width, categorical_target=False):
     """
-    resamples prediction on a single segmented series to original series sampling
+    resamples prediction on a single segmented series to original series
+    sampling
 
     Parameters
     ----------
@@ -229,8 +222,8 @@ def segmented_prediction_to_series(yp, step, width, categorical_target=False):
     width : int
         segmentation width (number of samples)
     categorical_target : boolean
-        set to True for classification problems and False for regression problems
-
+        set to True for classification problems and False for regression
+        problems
     Returns
     -------
     yt : array-like, shape [n, ]
@@ -260,7 +253,8 @@ def segmented_prediction_to_series(yp, step, width, categorical_target=False):
 
 def segmentation_mask(N, step, width):
     mask = np.tile(np.arange(width), (N, 1))
-    steps = np.array([np.arange(start=0, stop=N * step, step=step)]).transpose()
+    steps = np.array([np.arange(start=0,
+                      stop=N * step, step=step)]).transpose()
     steps = np.tile(steps, (1, width))
     mask = mask + steps
     return mask.flatten()
